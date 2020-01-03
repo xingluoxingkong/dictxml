@@ -12,6 +12,7 @@ class XML2Dict(object):
         --
         '''
         self.coding = coding
+        self.schemaLocation = ''
 
     def _make_child(self, node, children):
         for child in children:
@@ -37,6 +38,8 @@ class XML2Dict(object):
         attrib = {}
         if node.attrib:
             for k, v in node.attrib.items():
+                if 'schemaLocation' in k:
+                    self.schemaLocation =  '{' + v.split(' ')[0] + '}' 
                 attrib[k] = v
 
         nodeDict = {}
@@ -61,8 +64,22 @@ class XML2Dict(object):
         EL = ET.fromstring(xmlStr)
 
         res = {EL.tag: self._make_dict(EL)}
+        return self.decodeBytes(res)
+
+    def decodeBytes(self, res):
+        ''' 编码解析出来的数据
+        --
+        '''
+        res2 = {}
         for k, v in res.items():
             if isinstance(v, bytes):
                 res[k] = v.decode(self.coding)
-
+            if isinstance(v, list) or isinstance(v, dict) or isinstance(v, tuple):
+                res[k] = self.decodeBytes(v)
+            if '{' in k and '}' in k:
+                endNum = k.find('}')
+                k2 = k[endNum + 1:]
+                res2[k2] = res[k]
+        if self.schemaLocation:
+            return res2
         return res
