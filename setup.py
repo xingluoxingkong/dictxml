@@ -12,7 +12,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="dictxml",
-    version="0.0.1",
+    version="0.0.2",
     keywords=("pip", "pathtool", "timetool", "magetool", "mage"),
     description="xml和dict互相转换",
     long_description="xml和dict互相转换",
